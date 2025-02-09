@@ -1,0 +1,30 @@
+[
+    {
+      "id": 1,
+      "label": "Specification A",
+      "category": "Category 1",
+      "note": "Some additional details",
+      "user_value": 244,
+      "system_value": 89,
+      "name": "spec_a"
+    },
+    {
+      "id": 2,
+      "label": "Specification B",
+      "category": "Category 2",
+      "note": "Relevant information about this spec",
+      "user_value": 244,
+      "system_value": 89,
+      "name": "spec_b"
+    },
+    {
+      "id": 3,
+      "label": "Specification C",
+      "category": "Category 3",
+      "note": "Notes describing this specification",
+      "user_value": 244,
+      "system_value": 89,
+      "name": "spec_c"
+    }
+  ]
+  

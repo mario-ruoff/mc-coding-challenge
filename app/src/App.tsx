@@ -12,20 +12,17 @@ function App() {
   const [error, setError] = useState<string | null>(null)
 
   const handleDataChange = (file: File | null) => {
-
     // If file is removed
     if (!file) {
       setData([])
       setError(null);
     }
-
     // If file is uploaded
     else {
       const reader = new FileReader();
       reader.onload = (fileEvent) => {
         if (fileEvent.target) {
           try {
-            // Parse the JSON data from the file
             const json = JSON.parse(fileEvent.target.result as string);
             setData(json);
             setError(null);
@@ -41,37 +38,38 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
+      <div className="flex flex-col h-screen">
 
+        {/* Header section */}
+        <div className="relative h-1/4 px-4 py-8">
+          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center mt-4">
+            Interactive JSON Viewer
+          </h1>
+          <div className="absolute top-4 right-4">
+            <ModeToggle />
+          </div>
+        </div>
 
-      {/* Page title */}
-      <div className="fixed top-0 w-full text-center py-12">
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Interactive JSON Viewer</h1>
-      </div>
+        {/* Main content section */}
+        <div className="h-3/4 flex items-start justify-center">
+          <div className="w-full max-w-2xl">
 
-      {/* Theme switcher component */}
-      <div className="fixed top-0 right-0 p-4">
-        <ModeToggle />
-      </div>
+            {/* File dropzone component */}
+            <FileUploader handleDataChange={handleDataChange} accept={{ "application/json": [] }} />
 
-      <div className="flex min-h-svh w-full items-center justify-center">
-        <div className="w-full max-w-2xl">
+            {/* Error section */}
+            {error && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertCircle />
+                <AlertTitle className="ml-4">Error</AlertTitle>
+                <AlertDescription className="ml-4">{error}</AlertDescription>
+              </Alert>
+            )}
 
-          {/* File dropzone component */}
-          <FileUploader handleDataChange={handleDataChange} accept={{ "application/json": [] }} />
+            {/* JSON data table */}
+            {data.length > 0 && <DataTable data={data} />}
 
-          {/* Error section */}
-          {error && (
-            <Alert variant="destructive" className="mt-4">
-              <AlertCircle />
-              <AlertTitle className="ml-4">Error</AlertTitle>
-              <AlertDescription className="ml-4">{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {/* JSON data table */}
-          {data.length > 0 && <DataTable data={data} />}
-
-
+          </div>
         </div>
       </div>
     </ThemeProvider>

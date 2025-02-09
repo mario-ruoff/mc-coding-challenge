@@ -1,35 +1,9 @@
 import * as React from "react"
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown } from "lucide-react"
+import { ArrowUpDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 export type Data = {
   id: number
@@ -41,202 +15,92 @@ export type Data = {
   name: string
 }
 
-export const columns: ColumnDef<Data>[] = [
-  {
-    accessorKey: "label",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Label
-          <ArrowUpDown />
-        </Button>
-      )
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("label")}</div>,
-  },
-  {
-    accessorKey: "category",
-    header: "Category",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("category")}</div>
-    ),
-  },
-  {
-    accessorKey: "user_value",
-    header: () => <div className="text-right">User Value</div>,
-    cell: ({ row }) => {
-      const value = parseFloat(row.getValue("user_value"))
-
-      return <div className="text-right font-medium">{value}</div>
-    },
-  },
-  {
-    accessorKey: "system_value",
-    header: () => <div className="text-right">System Value</div>,
-    cell: ({ row }) => {
-      const value = parseFloat(row.getValue("system_value"))
-
-      return <div className="text-right font-medium">{value}</div>
-    },
-  },
-  {
-    accessorKey: "note",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Note
-          <ArrowUpDown />
-        </Button>
-      )
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("note")}</div>,
-  },
+const columns = [
+	{ key: "label", label: "Label", sortable: true },
+	{ key: "category", label: "Category" },
+	{ key: "user_value", label: "User Value", sortable: true },
+	{ key: "system_value", label: "System Value", sortable: true },
+	{ key: "note", label: "Note" },
 ]
 
 export function DataTable({ data }: { data: Data[] }) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [sortColumn, setSortColumn] = React.useState<string | null>(null)
+  const [sortDirection, setSortDirection] = React.useState<"asc" | "desc">("asc")
 
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  })
+  // Filter
+  const filteredData = data.filter(item =>
+    item.label.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  // Sort
+  const sortedData = React.useMemo(() => {
+    if (!sortColumn) return filteredData
+    return filteredData.slice().sort((a, b) => {
+      const aVal = a[sortColumn as keyof Data]
+      const bVal = b[sortColumn as keyof Data]
+      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1
+      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1
+      return 0
+    })
+  }, [filteredData, sortColumn, sortDirection])
+
+  const handleSort = (key: string) => {
+    if (sortColumn === key) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+    } else {
+      setSortColumn(key)
+      setSortDirection("asc")
+    }
+  }
 
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
           placeholder="Search by label"
-          value={(table.getColumn("label")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("label")?.setFilterValue(event.target.value)
-          }
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="max-w-sm"
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                )
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
+            <TableRow>
+              {columns.map(col => (
+                <TableHead key={col.key}>
+                  {col.sortable ? (
+                    <Button variant="ghost" onClick={() => handleSort(col.key)}>
+                      {col.label} <ArrowUpDown />
+                    </Button>
+                  ) : (
+                    col.label
+                  )}
+                </TableHead>
+              ))}
+            </TableRow>
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+            {sortedData.length ? (
+              sortedData.map(row => (
+                <TableRow key={row.id}>
+                  {columns.map(col => (
+                    <TableCell key={col.key}>
+                      {row[col.key as keyof Data] ?? ""}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   No results.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-sm text-muted-foreground">
-          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
       </div>
     </div>
   )

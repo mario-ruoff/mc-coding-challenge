@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ArrowUpDown, ChevronDown } from "lucide-react" // Added ChevronDown
+import { ArrowUpDown, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -55,6 +55,8 @@ export function DataTable({ data }: { data: Data[] }) {
   // Display component
   return (
     <div className="w-full">
+
+      {/* Search field */}
       <div className="flex items-center py-4">
         <Input
           placeholder="Search by label"
@@ -63,12 +65,16 @@ export function DataTable({ data }: { data: Data[] }) {
           className="max-w-sm"
         />
       </div>
+
+      {/* Data table */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
               {columns.map(col => (
                 <TableHead key={col.key} className="text-center">
+
+                  {/* Category, sorting filters */}
                   {col.key === "category" ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -80,7 +86,6 @@ export function DataTable({ data }: { data: Data[] }) {
                         {categoryOptions.map(category => (
                           <DropdownMenuCheckboxItem
                             key={category}
-                            // The checkbox is checked if this category is in the filters.
                             checked={categoryFilters[category] == true}
                             onCheckedChange={(checked) => {
                               const newFilters = { ...categoryFilters, [category]: checked }
@@ -99,11 +104,14 @@ export function DataTable({ data }: { data: Data[] }) {
                   ) : (
                     col.label
                   )}
+
                 </TableHead>
               ))}
             </TableRow>
           </TableHeader>
           <TableBody>
+
+            {/* Table cell content */}
             {sortedData.length ? (
               sortedData.map(row => (
                 <TableRow key={row.id}>
@@ -121,6 +129,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 </TableCell>
               </TableRow>
             )}
+
           </TableBody>
         </Table>
       </div>

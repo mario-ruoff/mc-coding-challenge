@@ -1,19 +1,12 @@
 import * as React from "react"
-import { ArrowUpDown } from "lucide-react"
-
+import { ArrowUpDown, ChevronDown } from "lucide-react" // Added ChevronDown
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-
-export type Data = {
-  id: number
-  label: string
-  category: "pending" | "processing" | "success" | "failed"
-  note: string
-  user_value: number
-  system_value: number
-  name: string
-}
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu"
+import { Data } from "@/types/data"
+import { Category } from "@/types/category"
+import { getEnumKeys, getTrueDict } from "@/lib/utils"
 
 const columns = [
 	{ key: "label", label: "Label", sortable: true },
@@ -22,28 +15,30 @@ const columns = [
 	{ key: "system_value", label: "System Value", sortable: true },
 	{ key: "note", label: "Note" },
 ]
+const categoryOptions = getEnumKeys(Category)
 
 export function DataTable({ data }: { data: Data[] }) {
   const [searchQuery, setSearchQuery] = React.useState("")
   const [sortColumn, setSortColumn] = React.useState<string | null>(null)
   const [sortDirection, setSortDirection] = React.useState<"asc" | "desc">("asc")
+  const [categoryFilters, setCategoryFilters] = React.useState(getTrueDict(categoryOptions))
 
-  // Filter
-  const filteredData = data.filter(item =>
-    item.label.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Filter: convert item.category to number if necessary
+  const filteredData = data.filter(item => {
+    const matchesLabel = item.label.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesCategory = categoryFilters[item.category] == true
+    return matchesLabel && matchesCategory
+  })
 
-  // Sort
-  const sortedData = React.useMemo(() => {
-    if (!sortColumn) return filteredData
-    return filteredData.slice().sort((a, b) => {
-      const aVal = a[sortColumn as keyof Data]
-      const bVal = b[sortColumn as keyof Data]
-      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1
-      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1
-      return 0
-    })
-  }, [filteredData, sortColumn, sortDirection])
+  const sortedData = !sortColumn
+	? filteredData
+	: filteredData.slice().sort((a, b) => {
+			const aVal = a[sortColumn as keyof Data]
+			const bVal = b[sortColumn as keyof Data]
+			if (aVal < bVal) return sortDirection === "asc" ? -1 : 1
+			if (aVal > bVal) return sortDirection === "asc" ? 1 : -1
+			return 0
+	  })
 
   const handleSort = (key: string) => {
     if (sortColumn === key) {
@@ -54,6 +49,7 @@ export function DataTable({ data }: { data: Data[] }) {
     }
   }
 
+  // Component
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
@@ -70,7 +66,30 @@ export function DataTable({ data }: { data: Data[] }) {
             <TableRow>
               {columns.map(col => (
                 <TableHead key={col.key}>
-                  {col.sortable ? (
+                  {col.key === "category" ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost">
+                          Category <ChevronDown />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {categoryOptions.map(category => (
+                          <DropdownMenuCheckboxItem
+                            key={category}
+                            // The checkbox is checked if this category is in the filters.
+                            checked={categoryFilters[category] == true}
+                            onCheckedChange={(checked) => {
+                              const newFilters = { ...categoryFilters, [category]: checked }
+                              setCategoryFilters(newFilters)
+                            }}
+                          >
+                            {category}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : col.sortable ? (
                     <Button variant="ghost" onClick={() => handleSort(col.key)}>
                       {col.label} <ArrowUpDown />
                     </Button>

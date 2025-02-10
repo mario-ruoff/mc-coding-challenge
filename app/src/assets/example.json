@@ -1,15 +1,6 @@
 [
   {
     "id": 0,
-    "label": "Tire Pressure",
-    "category": "Safety",
-    "note": "Measured in PSI",
-    "user_value": 35,
-    "system_value": 32,
-    "name": "tire_pressure"
-  },
-  {
-    "id": 1,
     "label": "Max Speed",
     "category": "Performance",
     "note": "Measured in km/h",
@@ -18,7 +9,7 @@
     "name": "max_speed"
   },
   {
-    "id": 2,
+    "id": 1,
     "label": "Battery Capacity",
     "category": "Power",
     "note": "Measured in kWh",
@@ -27,7 +18,7 @@
     "name": "battery_capacity"
   },
   {
-    "id": 3,
+    "id": 2,
     "label": "Weight",
     "category": "Physical",
     "note": "Measured in kg",
@@ -36,7 +27,7 @@
     "name": "weight"
   },
   {
-    "id": 4,
+    "id": 3,
     "label": "Torque",
     "category": "Performance",
     "note": "Measured in Nm",
@@ -45,7 +36,7 @@
     "name": "torque"
   },
   {
-    "id": 5,
+    "id": 4,
     "label": "Charging Time",
     "category": "Power",
     "note": "Time to charge from 0 to 100% in hours",
@@ -54,16 +45,16 @@
     "name": "charging_time"
   },
   {
-    "id": 6,
+    "id": 5,
     "label": "Fuel Efficiency",
-    "category": "Economy",
+    "category": "Performance",
     "note": "Measured in km/l",
     "user_value": 15,
     "system_value": 14,
     "name": "fuel_efficiency"
   },
   {
-    "id": 7,
+    "id": 6,
     "label": "Horsepower",
     "category": "Performance",
     "note": "Measured in HP",
@@ -72,16 +63,16 @@
     "name": "horsepower"
   },
   {
-    "id": 8,
+    "id": 7,
     "label": "Seating Capacity",
-    "category": "Interior",
+    "category": "Physical",
     "note": "Maximum number of passengers",
     "user_value": 5,
     "system_value": 5,
     "name": "seating_capacity"
   },
   {
-    "id": 9,
+    "id": 8,
     "label": "Top RPM",
     "category": "Performance",
     "note": "Maximum revolutions per minute",
@@ -90,21 +81,30 @@
     "name": "top_rpm"
   },
   {
-    "id": 10,
+    "id": 9,
     "label": "Cargo Volume",
-    "category": "Storage",
+    "category": "Physical",
     "note": "Measured in liters",
     "user_value": 500,
     "system_value": 480,
     "name": "cargo_volume"
   },
   {
-    "id": 11,
+    "id": 10,
     "label": "Turning Radius",
-    "category": "Maneuverability",
+    "category": "Performance",
     "note": "Measured in meters",
     "user_value": 5.5,
     "system_value": 5.2,
     "name": "turning_radius"
+  },
+  {
+    "id": 11,
+    "label": "Tire Pressure",
+    "category": "Power",
+    "note": "Measured in PSI",
+    "user_value": 35,
+    "system_value": 32,
+    "name": "tire_pressure"
   }
 ]

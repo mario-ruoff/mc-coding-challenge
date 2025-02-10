@@ -59,6 +59,10 @@ yarn build
 
 The built files will be in the `dist` directory.
 
+### Online Version
+
+The application is also available online at `json.mario-ruoff.x10.mx`.
+
 ## VS Code Dev Containers
 
 This project includes configuration for developing inside a VS Code Dev Container. To use it:

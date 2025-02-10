@@ -6,33 +6,58 @@ import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { FileUploader } from "@/components/common/file-uploader"
 import "./App.css"
+import { Data } from "@/types/data"
+import { Category } from "@/types/category"
+import { getEnumKeys } from "@/lib/utils"
+
+// Helper for data structure verification
+function verifyDataStructure(data: unknown) {
+  if (!Array.isArray(data)) {
+    return false
+  }
+  console.log(data.every((item) => typeof item.category === "number"))
+  return data.every((item) => 
+    typeof item.id === "number" &&
+    typeof item.label === "string" &&
+    getEnumKeys(Category).includes(item.category) &&
+    typeof item.note === "string" &&
+    typeof item.user_value === "number" &&
+    typeof item.system_value === "number" &&
+    typeof item.name === "string"
+  )
+}
 
 function App() {
-  const [data, setData] = useState([])
+  const [data, setData] = useState<Data[]>([])
   const [error, setError] = useState<string | null>(null)
 
   const handleDataChange = (file: File | null) => {
     // If file is removed
     if (!file) {
       setData([])
-      setError(null);
+      setError(null)
     }
     // If file is uploaded
     else {
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onload = (fileEvent) => {
         if (fileEvent.target) {
           try {
-            const json = JSON.parse(fileEvent.target.result as string);
-            setData(json);
-            setError(null);
+            const json = JSON.parse(fileEvent.target.result as string)
+            if (!verifyDataStructure(json)) {
+              setError("Uploaded JSON does not match expected data structure.")
+              setData([])
+              return
+            }
+            setData(json)
+            setError(null)
           } catch (error) {
-            console.error("Error parsing JSON:", error);
-            setError("JSON could not be parsed. Please check the file format.");
+            console.error("Error parsing JSON:", error)
+            setError("JSON could not be parsed. Please check the file format.")
           }
         }
-      };
-      reader.readAsText(file);
+      }
+      reader.readAsText(file)
     }
   }
 

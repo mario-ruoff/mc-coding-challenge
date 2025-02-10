@@ -8,6 +8,7 @@ import { Data } from "@/types/data"
 import { Category } from "@/types/category"
 import { getEnumKeys, getTrueDict } from "@/lib/utils"
 
+// Define table columns with properties
 const columns = [
 	{ key: "label", label: "Label", sortable: true },
 	{ key: "category", label: "Category" },
@@ -17,39 +18,41 @@ const columns = [
 ]
 const categoryOptions = getEnumKeys(Category)
 
+
 export function DataTable({ data }: { data: Data[] }) {
   const [searchQuery, setSearchQuery] = React.useState("")
   const [sortColumn, setSortColumn] = React.useState<string | null>(null)
   const [sortDirection, setSortDirection] = React.useState<"asc" | "desc">("asc")
   const [categoryFilters, setCategoryFilters] = React.useState(getTrueDict(categoryOptions))
 
-  // Filter: convert item.category to number if necessary
+  // Filter content
   const filteredData = data.filter(item => {
     const matchesLabel = item.label.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = categoryFilters[item.category] == true
     return matchesLabel && matchesCategory
   })
 
-  const sortedData = !sortColumn
-	? filteredData
-	: filteredData.slice().sort((a, b) => {
+  // Sort content
+  const sortedData = sortColumn
+	? filteredData.slice().sort((a, b) => {
 			const aVal = a[sortColumn as keyof Data]
 			const bVal = b[sortColumn as keyof Data]
 			if (aVal < bVal) return sortDirection === "asc" ? -1 : 1
 			if (aVal > bVal) return sortDirection === "asc" ? 1 : -1
 			return 0
 	  })
+  : filteredData
 
   const handleSort = (key: string) => {
     if (sortColumn === key) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc")  // Swap sort direction
     } else {
       setSortColumn(key)
       setSortDirection("asc")
     }
   }
 
-  // Component
+  // Display component
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
@@ -65,7 +68,7 @@ export function DataTable({ data }: { data: Data[] }) {
           <TableHeader>
             <TableRow>
               {columns.map(col => (
-                <TableHead key={col.key}>
+                <TableHead key={col.key} className="text-center">
                   {col.key === "category" ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -105,7 +108,7 @@ export function DataTable({ data }: { data: Data[] }) {
               sortedData.map(row => (
                 <TableRow key={row.id}>
                   {columns.map(col => (
-                    <TableCell key={col.key}>
+                    <TableCell key={col.key} className="text-center">
                       {row[col.key as keyof Data] ?? ""}
                     </TableCell>
                   ))}

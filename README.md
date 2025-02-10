@@ -45,6 +45,8 @@ yarn dev
 
 The application will be available at `http://localhost:5173/`.
 
+> An example file with the correct data structure can be found in `src/assets/example.json`.
+
 ### Building for Production
 
 To build the application for production, run:
